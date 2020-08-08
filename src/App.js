@@ -191,7 +191,7 @@ function App() {
         <KeyboardDatePicker
           disableToolbar
           variant="inline"
-          format="MM/dd/yyyy"
+          format="dd/MM/yyyy"
           margin="normal"
           label="Date"
           value={date}
