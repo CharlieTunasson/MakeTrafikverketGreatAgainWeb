@@ -1,160 +1,236 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState } from 'react'
+import './App.css'
 
+import Input from '@material-ui/core/Input'
+import InputLabel from '@material-ui/core/InputLabel'
+import MenuItem from '@material-ui/core/MenuItem'
+import ListItemText from '@material-ui/core/ListItemText'
+import Select from '@material-ui/core/Select'
+import Checkbox from '@material-ui/core/Checkbox'
+import FormControl from '@material-ui/core/FormControl'
+import { makeStyles, TextField, Icon, Button, Paper } from '@material-ui/core'
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers'
 
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Select from '@material-ui/core/Select';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControl from '@material-ui/core/FormControl';
+import 'date-fns'
+import DateFnsUtils from '@date-io/date-fns'
 
+import ky from 'ky'
 
-const listOfCitiesAndId = [
-  { 'Örebro': 1000001 },
-  { 'Karlskoga': 1000003 },
-  { 'Eskilstuna': 1000005 },
-  { 'linköping': 1000009 },
-  { 'motala': 1000011 },
-  { 'vimmerby': 1000015 },
-  { 'umea': 1000021 },
-  { 'farsta': 1000019 },
-  { 'Stockholm City': 1000140 },
-]
+const listOfCitiesAndId = {
+  Alvsbyn: 1000088,
+  Angelholm: 1000122,
+  Bollnas: 1000121,
+  Borlange: 1000324,
+  Eskilstuna: 1000005,
+  Fagersta: 1000039,
+  Falun: 1000098,
+  Farsta: 1000019,
+  Gallivare: 1000090,
+  Gavle: 1000118,
+  Haparanda: 1000084,
+  Harnosand: 1000057,
+  Hudiksvall: 1000056,
+  Jarfalla: 1000326,
+  Jokkmokk: 1000091,
+  Jonkoping: 1000074,
+  Kalix: 1000085,
+  Kalmar: 1000093,
+  Karlshamn: 1000048,
+  Karlskoga: 1000003,
+  Karlskrona: 1000047,
+  Koping: 1000040,
+  Kristianstad: 1000046,
+  Linkoping: 1000009,
+  Ljungby: 1000028,
+  Lulea: 1000082,
+  Lund: 1000062,
+  Malmo: 1000061,
+  Motala: 1000011,
+  Norrkoping: 1000329,
+  Nykoping: 1000149,
+  Orebro: 1000001,
+  Ornskoldsvik: 1000106,
+  Oskarshamn: 1000094,
+  Ostersund: 1000112,
+  Overtornea: 1000089,
+  Pitea: 1000087,
+  Skelleftea: 1000111,
+  Skovde: 1000130,
+  Sodertalje: 1000132,
+  Sollentuna: 1000134,
+  Stockholm: 1000140,
+  Sundsvall: 1000105,
+  Sunne: 1000036,
+  Sveg: 1000117,
+  Umeå: 1000021,
+  Uppsala: 1000071,
+  Vasteras: 1000038,
+  Vastervik: 1000095,
+  Vaxjo: 1000030,
+  Vetlanda: 1000078,
+  Vimmerby: 1000015,
+  Visby: 1000097,
+}
 
-{/*
-        case ljungby = 1000028
-        case vaxjo = 1000030
-        case sunne = 1000036
-        case vasteras = 1000038
-        case fagersta = 1000039
-        case koping = 1000040
-        case kristianstad = 1000046
-        case karlskrona = 1000047
-        case karlshamn = 1000048
-        case hudiksvall = 1000056
-        case harnosand = 1000057
-        case malmo = 1000061
-        case lund = 1000062
-        case uppsala = 1000071
-        case jonkoping = 1000074
-        case vetlanda = 1000078
-        case lulea = 1000082
-        case haparanda = 1000084
-        case kalix = 1000085
-        case pitea = 1000087
-        case alvsbyn = 1000088
-        case overtornea = 1000089
-        case gallivare = 1000090
-        case jokkmokk = 1000091
-        case kalmar = 1000093
-        case oskarshamn = 1000094
-        case vastervik = 1000095
-        case visby = 1000097
-        case falun = 1000098
-        case sundsvall = 1000105
-        case ornskoldsvik = 1000106
-        case skelleftea = 1000111
-        case ostersund = 1000112
-        case gavle = 1000118
-        case sveg = 1000117
-        case bollnas = 1000121
-        case angelholm = 1000122
-        case skovde = 1000130
-        case sodertalje = 1000132
-        case sollentuna = 1000134
-        case nykoping = 1000149
-        case borlange = 1000324
-        case jarfalla = 1000326
-        case norrkoping = 1000329 */}
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 220,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}))
 
 function App() {
+  const classes = useStyles()
 
   const [language, setLanguage] = useState(4)
-  const [cities, setCities] = useState(listOfCitiesAndId[0])
-  const [exam, setExam] = useState("Practical") //Theory
+  const [cities, setCities] = useState([('Stockholm': 1000140)])
+  const [exam, setExam] = useState('practical') //Theory
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [ssn, setSsn] = useState()
+
+  const [responseData, setResponseData] = useState()
+
+  const searchTimes = async () => {
+    try {
+      const response = await ky
+        .get(
+          `https://make-trafikverket-great-again.herokuapp.com/tests/${ssn}`
+          // { mode: 'no-cors' }
+        )
+        .json()
+      console.log(response)
+      setResponseData(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
-    <div className="App">
+    <div
+      className="App"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <h1>Make Trafikverket Great Again!</h1>
 
-      <form>
-        <label htmlFor="language">Choose language:</label>
-        <br></br>
-        <select name="language" id="language" value={language} onChange={(event) => setLanguage(event.target.value)}>
-          <option value="svenska">Svenska</option>
-          <option value="4">Engelska</option>
-          <option value="albanska">Albanska</option>
-          <option value="arabiska">Arabiska</option>
-          <option value="bosniska">Bosniska</option>
-          <option value="finska">Finska</option>
-          <option value="franska">Franska</option>
-          <option value="kroatiska">Kroatiska</option>
-          <option value="persiska">Persiska</option>
-          <option value="ryska">Ryska</option>
-          <option value="serbiska">Serbiska</option>
-          <option value="somaliska">Somaliska</option>
-          <option value="sorani">Sorani</option>
-          <option value="spanska">Spanska</option>
-          <option value="thailändska">Thailändska</option>
-          <option value="turkiska">Turkiska</option>
-          <option value="tyska">Tyska</option>
-        </select>
-
-        <br></br>
-        <br></br>
-
-        <label htmlFor="city">City:</label>
-        <br></br>
-        <input name="city" id="city" type="text" placeholder="Type city here" ></input>
-
-        <InputLabel id="cities">Cities</InputLabel>
+      <FormControl className={classes.formControl} required>
+        <InputLabel htmlFor="language">Choose language</InputLabel>
         <Select
+          name="language"
+          labelId="language"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value)}
+        >
+          <MenuItem value="svenska">Svenska</MenuItem>
+          <MenuItem value="4">Engelska</MenuItem>
+          <MenuItem value="albanska">Albanska</MenuItem>
+          <MenuItem value="arabiska">Arabiska</MenuItem>
+          <MenuItem value="bosniska">Bosniska</MenuItem>
+          <MenuItem value="finska">Finska</MenuItem>
+          <MenuItem value="franska">Franska</MenuItem>
+          <MenuItem value="kroatiska">Kroatiska</MenuItem>
+          <MenuItem value="persiska">Persiska</MenuItem>
+          <MenuItem value="ryska">Ryska</MenuItem>
+          <MenuItem value="serbiska">Serbiska</MenuItem>
+          <MenuItem value="somaliska">Somaliska</MenuItem>
+          <MenuItem value="sorani">Sorani</MenuItem>
+          <MenuItem value="spanska">Spanska</MenuItem>
+          <MenuItem value="thailändska">Thailändska</MenuItem>
+          <MenuItem value="turkiska">Turkiska</MenuItem>
+          <MenuItem value="tyska">Tyska</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl className={classes.formControl} required>
+        <InputLabel htmlFor="cities">Cities</InputLabel>
+        <Select
+          name="cities"
           labelId="cities"
-          id="cities"
           multiple
           value={cities}
           onChange={(event) => setCities(event.target.value)}
           input={<Input />}
-          // renderValue={(selected) => selected.join(', ')}
+          renderValue={(selected) => selected.join(', ')}
         >
-          {listOfCitiesAndId.forEach((city) => (
+          {Object.keys(listOfCitiesAndId).map((city) => (
             <MenuItem key={city} value={city}>
-              <Checkbox checked={listOfCitiesAndId.indexOf(city) > -1} />
+              <Checkbox checked={cities.indexOf(city) > -1} />
               <ListItemText primary={city} />
             </MenuItem>
           ))}
         </Select>
+      </FormControl>
 
-        <br></br>
-        <br></br>
+      <FormControl className={classes.formControl} required>
+        <InputLabel htmlFor="exam">Type of exam</InputLabel>
+        <Select
+          name="exam"
+          id="exam"
+          value={exam}
+          onChange={(event) => setExam(event.target.value)}
+        >
+          <MenuItem value="theory">Theory</MenuItem>
+          <MenuItem value="practical">Practical</MenuItem>
+        </Select>
+      </FormControl>
 
-        <label htmlFor="exam">Type of exam:</label>
-        <br></br>
-        <select name="exam" id="exam">
-          <option value="theory">Theory</option>
-          <option value="practical">Practical</option>
-        </select>
+      <MuiPickersUtilsProvider
+        utils={DateFnsUtils}
+        required
+        classes={{ root: classes.selectEmpty }}
+      >
+        <KeyboardDatePicker
+          disableToolbar
+          variant="inline"
+          format="MM/dd/yyyy"
+          margin="normal"
+          label="Date"
+          value={date}
+          onChange={(date) => setDate(date)}
+          style={{ marginTop: '8px' }}
+        />
+      </MuiPickersUtilsProvider>
 
-        <br></br>
-        <br></br>
-
-        <label htmlFor="date">Date:</label>
-        <br></br>
-        <input name="date" id="date" type="date"></input>
-
-        <br></br>
-        <br></br>
-
-        <label htmlFor="ssn">Social security number:</label>
-        <br></br>
-        <input name="ssn" id="ssn" type="text" pattern="/^(19|20)?(\d{6}(-|\s)\d{4}|(?!19|20)\d{10})$/"></input>
+      <form className={classes.formControl} required>
+        <TextField
+          // value={ssn}
+          onChange={(event) => setSsn(event.target.value)}
+          label="Social security number"
+          autoFocus
+          error={
+            ssn?.length < 10 ||
+            // (ssn?.length > 0 &&
+            //   ssn?.match('/^(19|20)?(d{6}(-|s)d{4}|(?!19|20)d{10})$/')) ||
+            ssn?.length === 11 ||
+            ssn?.length > 12
+          }
+          style={{ width: '100%' }}
+        />
       </form>
 
+      <Button
+        variant="contained"
+        color="primary"
+        endIcon={<Icon>send</Icon>}
+        style={{ width: '220px', marginTop: '16px' }}
+        onClick={() => searchTimes()}
+        size="large"
+      >
+        Search
+      </Button>
+
+      <Paper>{JSON.stringify(responseData)}</Paper>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
