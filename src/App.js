@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 
 import Input from '@material-ui/core/Input'
@@ -88,13 +88,25 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles()
 
-  const [language, setLanguage] = useState(4)
+  const [licence, setLicence] = useState(5)
   const [cities, setCities] = useState([('Stockholm': 1000140)])
-  const [exam, setExam] = useState('practical') //Theory
+  const [exam, setExam] = useState(12)
+  const [language, setLanguage] = useState(4)
+  const [car, setCar] = useState(2)
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [ssn, setSsn] = useState()
 
   const [responseData, setResponseData] = useState()
+
+  // useEffect(() => {
+  //   console.log(licence)
+  //   console.log(cities)
+  //   console.log(exam)
+  //   console.log(language)
+  //   console.log(car)
+  //   console.log(date)
+  //   console.log(ssn)
+  // }, [licence, cities, exam, language, car, date, ssn])
 
   const searchTimes = async () => {
     try {
@@ -120,33 +132,65 @@ function App() {
         alignItems: 'center',
       }}
     >
-      <h1>Make Trafikverket Great Again!</h1>
+      <h1 style={{ color: '#E41A11' }}>Make Trafikverket Great Again!</h1>
 
       <FormControl className={classes.formControl} required>
-        <InputLabel htmlFor="language">Choose language</InputLabel>
+        <InputLabel htmlFor="licence">Licence</InputLabel>
         <Select
-          name="language"
-          labelId="language"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value)}
+          name="licence"
+          labelId="licence"
+          value={licence}
+          onChange={(event) => setLicence(event.target.value)}
         >
-          <MenuItem value="svenska">Svenska</MenuItem>
-          <MenuItem value="4">Engelska</MenuItem>
-          <MenuItem value="albanska">Albanska</MenuItem>
-          <MenuItem value="arabiska">Arabiska</MenuItem>
-          <MenuItem value="bosniska">Bosniska</MenuItem>
-          <MenuItem value="finska">Finska</MenuItem>
-          <MenuItem value="franska">Franska</MenuItem>
-          <MenuItem value="kroatiska">Kroatiska</MenuItem>
-          <MenuItem value="persiska">Persiska</MenuItem>
-          <MenuItem value="ryska">Ryska</MenuItem>
-          <MenuItem value="serbiska">Serbiska</MenuItem>
-          <MenuItem value="somaliska">Somaliska</MenuItem>
-          <MenuItem value="sorani">Sorani</MenuItem>
-          <MenuItem value="spanska">Spanska</MenuItem>
-          <MenuItem value="thailändska">Thailändska</MenuItem>
-          <MenuItem value="turkiska">Turkiska</MenuItem>
-          <MenuItem value="tyska">Tyska</MenuItem>
+          <MenuItem value={4}>A - Motorcycle</MenuItem>
+          <MenuItem value={2}>A1 - Light motorcycle</MenuItem>
+          <MenuItem value={24}>A2 - Motorcycle (Limited)</MenuItem>
+          <MenuItem value={32}>ADR - Hazardous goods</MenuItem>
+          <MenuItem value={1}>AM - Moped</MenuItem>
+          <MenuItem value={33}>APV - Roadworks</MenuItem>
+          <MenuItem value={5}>B - Car</MenuItem>
+          <MenuItem value={23}>B96 - Car (Extended)</MenuItem>
+          <MenuItem value={7}>BE - Car with heavy trailer</MenuItem>
+          <MenuItem value={21}>Bus - Passenger transport</MenuItem>
+          <MenuItem value={29}>
+            Bus - Professional competence for passenger transport
+          </MenuItem>
+          <MenuItem value={8}>C - Heavy lorry</MenuItem>
+          <MenuItem value={25}>C1 - Medium-weight lorry</MenuItem>
+          <MenuItem value={26}>
+            C1E - Medium-weight lorry with heavy trailer
+          </MenuItem>
+          <MenuItem value={9}>CE - Heavy lorry with heavy trailer</MenuItem>
+          <MenuItem value={10}>D - Bus</MenuItem>
+          <MenuItem value={27}>D1 - Bus (Limited)</MenuItem>
+          <MenuItem value={28}>D1E - Bus with heavy trailer (Limited)</MenuItem>
+          <MenuItem value={11}>DE - Bus with heavy trailer</MenuItem>
+          <MenuItem value={22}>Lorry - Goods transport</MenuItem>
+          <MenuItem value={30}>
+            Goods - Professional competence for goods transport
+          </MenuItem>
+          <MenuItem value={31}>
+            Train driver - Train driver certificate
+          </MenuItem>
+          <MenuItem value={13}>Taxi - Taxi driver licence</MenuItem>
+          <MenuItem value={17}>
+            Taxi - Professional competence for taxi driving
+          </MenuItem>
+          <MenuItem value={18}>Tractor - Tractor licence</MenuItem>
+          <MenuItem value={34}>VVH - Winter roads maintenance</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl className={classes.formControl} required>
+        <InputLabel htmlFor="exam">Exam</InputLabel>
+        <Select
+          name="exam"
+          id="exam"
+          value={exam}
+          onChange={(event) => setExam(event.target.value)}
+        >
+          <MenuItem value={3}>Theory</MenuItem>
+          <MenuItem value={12}>Practical</MenuItem>
         </Select>
       </FormControl>
 
@@ -170,18 +214,51 @@ function App() {
         </Select>
       </FormControl>
 
-      <FormControl className={classes.formControl} required>
-        <InputLabel htmlFor="exam">Type of exam</InputLabel>
-        <Select
-          name="exam"
-          id="exam"
-          value={exam}
-          onChange={(event) => setExam(event.target.value)}
-        >
-          <MenuItem value="theory">Theory</MenuItem>
-          <MenuItem value="practical">Practical</MenuItem>
-        </Select>
-      </FormControl>
+      {exam === 3 && (
+        <FormControl className={classes.formControl} required>
+          <InputLabel htmlFor="language">Language</InputLabel>
+          <Select
+            name="language"
+            labelId="language"
+            value={language}
+            onChange={(event) => setLanguage(event.target.value)}
+          >
+            <MenuItem value={13}>Svenska</MenuItem>
+            <MenuItem value={4}>Engelska</MenuItem>
+            <MenuItem value={1}>Albanska</MenuItem>
+            <MenuItem value={2}>Arabiska</MenuItem>
+            <MenuItem value={14}>Bosniska</MenuItem>
+            <MenuItem value={5}>Finska</MenuItem>
+            <MenuItem value={6}>Franska</MenuItem>
+            <MenuItem value={15}>Kroatiska</MenuItem>
+            <MenuItem value={7}>Persiska</MenuItem>
+            <MenuItem value={8}>Ryska</MenuItem>
+            <MenuItem value={16}>Serbiska</MenuItem>
+            <MenuItem value={128}>Somaliska</MenuItem>
+            <MenuItem value={9}>Sorani</MenuItem>
+            <MenuItem value={10}>Spanska</MenuItem>
+            <MenuItem value={133}>Thailändska</MenuItem>
+            <MenuItem value={11}>Turkiska</MenuItem>
+            <MenuItem value={12}>Tyska</MenuItem>
+          </Select>
+        </FormControl>
+      )}
+
+      {exam === 12 && (
+        <FormControl className={classes.formControl} required>
+          <InputLabel htmlFor="car">Rent car</InputLabel>
+          <Select
+            name="car"
+            id="car"
+            value={car}
+            onChange={(event) => setCar(event.target.value)}
+          >
+            <MenuItem value="1">No</MenuItem>
+            <MenuItem value="2">Yes, manual</MenuItem>
+            <MenuItem value="4">Yes, automatic</MenuItem>
+          </Select>
+        </FormControl>
+      )}
 
       <MuiPickersUtilsProvider
         utils={DateFnsUtils}
