@@ -65,7 +65,7 @@ const listOfCitiesAndId = {
   Sundsvall: 1000105,
   Sunne: 1000036,
   Sveg: 1000117,
-  Umeå: 1000021,
+  Umea: 1000021,
   Uppsala: 1000071,
   Vasteras: 1000038,
   Vastervik: 1000095,
