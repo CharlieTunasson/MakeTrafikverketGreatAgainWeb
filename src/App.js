@@ -253,9 +253,9 @@ function App() {
             value={car}
             onChange={(event) => setCar(event.target.value)}
           >
-            <MenuItem value="1">No</MenuItem>
-            <MenuItem value="2">Yes, manual</MenuItem>
-            <MenuItem value="4">Yes, automatic</MenuItem>
+            <MenuItem value={1}>No</MenuItem>
+            <MenuItem value={2}>Yes, manual</MenuItem>
+            <MenuItem value={4}>Yes, automatic</MenuItem>
           </Select>
         </FormControl>
       )}
