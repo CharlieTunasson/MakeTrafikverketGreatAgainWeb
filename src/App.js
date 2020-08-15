@@ -8,7 +8,16 @@ import ListItemText from '@material-ui/core/ListItemText'
 import Select from '@material-ui/core/Select'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormControl from '@material-ui/core/FormControl'
-import { makeStyles, TextField, Icon, Button, Paper } from '@material-ui/core'
+import {
+  makeStyles,
+  TextField,
+  Icon,
+  Button,
+  Paper,
+  Card,
+  CardContent,
+  CardActions,
+} from '@material-ui/core'
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
@@ -110,11 +119,23 @@ function App() {
 
   const searchTimes = async () => {
     try {
+      let citiesId = []
+      cities.map((city) => {
+        citiesId.push(listOfCitiesAndId[city])
+      })
+      console.log(citiesId)
       const response = await ky
-        .get(
-          `https://make-trafikverket-great-again.herokuapp.com/tests/${ssn}`
-          // { mode: 'no-cors' }
-        )
+        .post(`https://make-trafikverket-great-again.herokuapp.com/tests/`, {
+          json: {
+            ssn,
+            languageId: language,
+            locationIds: citiesId,
+            licenceId: licence,
+            examinationTypeId: exam,
+            startDate: date,
+            dateThreshold: 30,
+          },
+        })
         .json()
       console.log(response)
       setResponseData(response)
@@ -305,7 +326,27 @@ function App() {
         Search
       </Button>
 
-      <Paper>{JSON.stringify(responseData)}</Paper>
+      <br></br>
+      <br></br>
+      <br></br>
+      <Paper>
+        {JSON.stringify(responseData)}
+        {responseData &&
+          responseData.map((availableOccasion) => (
+            <Card>
+              <CardContent>
+                <h3>
+                  {availableOccasion.locationName} - {availableOccasion.name}
+                </h3>
+                <p>Cost: {availableOccasion.cost}</p>
+                <p>Date: {availableOccasion.duration.start}</p>
+              </CardContent>
+              <CardActions>
+                <Button size="small">Book</Button>
+              </CardActions>
+            </Card>
+          ))}
+      </Paper>
     </div>
   )
 }
